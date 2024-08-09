@@ -1,3 +1,4 @@
+import pandas as pd
 from company_data import check_filings, get_cik_list
 from form_data import get_form_data, process_form_data
 from insert_sql import insert_data
@@ -21,6 +22,10 @@ def main():
     
     print(f"Company data list: {len(company_data_list)} entries")
     print(f"Form data list: {len(form_data_list)} entries")
+    company_df = pd.DataFrame.from_records(company_data_list)
+    form_df = pd.DataFrame.from_records(form_data_list)
+    company_df.to_csv("Final Database/company_data.csv", index=False)
+    form_df.to_csv("Final Database/form_data.csv",index=False)
     
     # Get form data URLs and SCF CIKs
     print("Getting form data URLs and SCF CIKs...")
@@ -40,7 +45,6 @@ def main():
     # Insert data into the database or desired storage
     print("Inserting data into the database...")
     insert_data(company_data_list, form_data_list, all_data)
-    
     print("Main function execution completed.")
 
 if __name__ == "__main__":

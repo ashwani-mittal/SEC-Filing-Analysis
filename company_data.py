@@ -14,7 +14,6 @@ def get_cik_list():
         )
     company_data = pd.DataFrame.from_dict(companyTickers.json(), orient="index")
     company_data.columns = ['cik', 'ticker', 'title']
-
     company_data['cik'] = company_data['cik'].astype(str).str.zfill(10)
     cik_list = company_data['cik'].to_list()
     
@@ -32,7 +31,7 @@ def check_filings(cik):
 
     comp_keys = ['cik', 'name', 'tickers', 'ein']
     filings_meta = {k: v for k, v in filings.items() if k in comp_keys}
-    
+    filings_meta['cik'] = filings_meta['cik'].zfill(10)
     if filings_meta['tickers']:
         filings_meta['tickers'] = filings_meta['tickers'][0]
     else:

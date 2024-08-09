@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 
+from company_data import check_filings
+
 def process_text_entries(html_content):
     print("Processing text entries...")
     all_data = []
@@ -30,8 +32,12 @@ def final_process(all_data):
     print("Starting final process...")
     df_rows = []
     for cik, entries in all_data.items():
+        company_data,_,_ = check_filings(cik)
+        if company_data.get('cik') == cik:
+            name = company_data.get('name')
+            print(name)
         for entry in entries:
-            flattened_entry = {'CIK': cik, 'Supplier Financing Program': entry['Key']}
+            flattened_entry = {'CIK': cik,'Name': name, 'Supplier Financing Program': entry['scf_flag']}
             
             # Flatten the 'Content' column if it exists and is not None
             if 'Content' in entry and entry['Content'] is not None:

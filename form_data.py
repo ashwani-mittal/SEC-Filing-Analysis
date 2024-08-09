@@ -1,4 +1,5 @@
 import requests
+from company_data import check_filings
 from filter_data import filter_xml_content
 from headers import headers
 import xmltodict
@@ -17,7 +18,7 @@ def get_form_data(form_list):
             doc_link = form["primaryDocument"].replace(".", "_")
             url = base_url.format(cik, accessionNumber, doc_link)
             urls.append(url)
-            scf_cik_list.append(cik)
+            scf_cik_list.append(cik.zfill(10))
     print(f"Generated {len(urls)} URLs and SCF CIKs.")
     return urls, scf_cik_list
 
@@ -40,6 +41,7 @@ def fetch_and_parse_xml(urls):
     return [fetch_data(url) for url in urls]
 
 def process_form_data(urls, cik):
+    name = None
     print(f"Processing form data for CIK: {cik}...")
     keywords = [r'supplierfinanceprogram.*textblock']   # Keywords to filter the document
     entries = []
@@ -48,7 +50,7 @@ def process_form_data(urls, cik):
         xml_data = fetch_data(url)
         if xml_data is None:
             print(f"No data returned for URL: {url}")
-            entries.append({"Key": 0, "Content": None})
+            entries.append({"scf_flag": 0, "Name": name, "Content": None})
             continue
         
         filtered_results = filter_xml_content(xml_data, keywords)
@@ -57,10 +59,10 @@ def process_form_data(urls, cik):
             for k, v in filtered_results:
                 if isinstance(v, dict) and '#text' in v:
                     data_dict = process_text_entries(v["#text"])
-                    entries.append({"Key": 1, "Content": data_dict})
+                    entries.append({"scf_flag": 1, "Name": name, "Content": data_dict})
         else:
             print(f"No filtered results found for URL: {url}")
-            entries.append({"Key": 0, "Content": None})
+            entries.append({"scf_flag": 0, "Name": name, "Content": None})
     
     print(f"Processed {len(entries)} entries for CIK: {cik}.")
     return entries

@@ -19,6 +19,7 @@ CREATE TABLE form_data (
 
 CREATE TABLE scf_data (
     cik VARCHAR(10),
+    company_name VARCHAR(255),
     supplier_financing_program VARCHAR(50),
     text_content TEXT,
     table_content TEXT

@@ -38,14 +38,14 @@ def insert_data(company_data_list, form_data_list, all_data):
         print("Inserting SCF Data...")
         # Insert df_all_data into scf_data table
         df_all_data = final_process(all_data)  # Call final_process to get the DataFrame
-        
+        df_all_data.to_csv('Final Database/scf_data.csv',index=False)
         for index, row in df_all_data.iterrows():
             json_string = json.dumps(row['Table'])
             cik = row['CIK']
             cursor.execute("SELECT * FROM scf_data WHERE cik = %s", (cik,))
             existing_company = cursor.fetchone()
             if not existing_company:
-                cursor.execute("INSERT INTO scf_data (cik, supplier_financing_program, text_content, table_content) VALUES (%s, %s, %s, %s)", (row['CIK'], row['Supplier Financing Program'], row['Text'], json_string))
+                cursor.execute("INSERT INTO scf_data (cik, company_name, supplier_financing_program, text_content, table_content) VALUES (%s, %s, %s, %s, %s)", (row['CIK'],row['Name'], row['Supplier Financing Program'], row['Text'], json_string))
                 print(f"Inserted SCF Data for CIK: {cik}")
 
         # Commit changes to the database
